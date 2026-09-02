@@ -1,5 +1,45 @@
 # @atproto/bsky
 
+## 0.0.278
+
+### Patch Changes
+
+- [#5457](https://github.com/bluesky-social/atproto/pull/5457) [`ffcb7c5`](https://github.com/bluesky-social/atproto/commit/ffcb7c54e4dcedb10eed9175fbc939761462bca6) Thanks [@treethought](https://github.com/treethought)! - Abort upstream calls made by read endpoints when the client disconnects. Feed, search, and suggestion queries now forward the request's cancellation signal to their outbound calls, so a caller hanging up no longer leaves those requests running.
+
+- [#5461](https://github.com/bluesky-social/atproto/pull/5461) [`60c4395`](https://github.com/bluesky-social/atproto/commit/60c439595101fbcbe612463e6f23200590c5daaf) Thanks [@blackmichael](https://github.com/blackmichael)! - Add reference-list opt-out records and enforce them in AppView list, list feed, and starter-pack views.
+
+- [#5465](https://github.com/bluesky-social/atproto/pull/5465) [`328a4a8`](https://github.com/bluesky-social/atproto/commit/328a4a86a999357eeae12a6da897bf686b4da88e) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - Issue iris and topics requests through the global fetch, using long-lived dispatchers that are closed on shutdown.
+
+- [#5464](https://github.com/bluesky-social/atproto/pull/5464) [`a058557`](https://github.com/bluesky-social/atproto/commit/a0585579f000dc489b5524b02955fdca1de6665c) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - Setup OTEL metrics on bsky and report some hydration failures
+
+- [#5454](https://github.com/bluesky-social/atproto/pull/5454) [`f7fe823`](https://github.com/bluesky-social/atproto/commit/f7fe8237f6cc83da45c1494ca90c94c4b2a65a23) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - Add a 1s timeout to requests to iris.
+
+- [#5455](https://github.com/bluesky-social/atproto/pull/5455) [`9a72c51`](https://github.com/bluesky-social/atproto/commit/9a72c515b1886256f05b1e28d61e5a1caade1d74) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - Use a connection timeout for requests to iris and topics.
+
+- [#5451](https://github.com/bluesky-social/atproto/pull/5451) [`ff99ec0`](https://github.com/bluesky-social/atproto/commit/ff99ec0a35e3b2b91cb8fb8fef780abb623a1f90) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - Serve known likers on the root post of each feed item instead of on the feed item itself.
+
+- [#5473](https://github.com/bluesky-social/atproto/pull/5473) [`cae15d9`](https://github.com/bluesky-social/atproto/commit/cae15d9fd007206878d51f990b321a508b3044b7) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - Add a `BSKY_FEED_GEN_SKELETON_TIMEOUT` option, bounding feed generator skeleton requests. Defaults to 5s, lowered from the previously hardcoded 10s.
+
+- [#5472](https://github.com/bluesky-social/atproto/pull/5472) [`222f4bc`](https://github.com/bluesky-social/atproto/commit/222f4bc600fb89c75fafee95ef3c837b1721601e) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - Move the RPC telemetry constants shared by both halves of a bsync call into `@atproto-labs/opentelemetry-node`: the `bsync.namespace` and `bsync.operation` attribute keys and `RPC_CALL_DURATION_BUCKETS` are now exported from the `/conventions` entrypoint, and `statusCodeToString()` from the new `/util` entrypoint. Previously the AppView imported these from `@atproto/bsync`, which made a whole service package a runtime dependency of another just to agree on a metric label.
+
+- [#5456](https://github.com/bluesky-social/atproto/pull/5456) [`db6e2e7`](https://github.com/bluesky-social/atproto/commit/db6e2e70d1168c1a2fcf068ec42eaac6fd1702d5) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - Reduce dataplane calls when refilling paginated responses. Pages are now served once they hold half of the requested limit, and `listNotifications` reads the viewer's priority setting and last-seen time once per request instead of once per page.
+
+- [#5470](https://github.com/bluesky-social/atproto/pull/5470) [`715caf1`](https://github.com/bluesky-social/atproto/commit/715caf130a9347b36b9cbdf479ae5d6113e030c6) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - Record client and server latency metrics and traces for bsync requests, including operation namespaces.
+
+- [#5465](https://github.com/bluesky-social/atproto/pull/5465) [`328a4a8`](https://github.com/bluesky-social/atproto/commit/328a4a86a999357eeae12a6da897bf686b4da88e) Thanks [@rafaeleyng](https://github.com/rafaeleyng)! - Add a `BSKY_PROXY_CONNECT_TIMEOUT` option, bounding the connection phase of blob proxy requests.
+
+- Updated dependencies [[`8a4631a`](https://github.com/bluesky-social/atproto/commit/8a4631a47ce6791b3868f06d1c930aa21327748c), [`60c4395`](https://github.com/bluesky-social/atproto/commit/60c439595101fbcbe612463e6f23200590c5daaf), [`5c154f9`](https://github.com/bluesky-social/atproto/commit/5c154f9c5173e7823a5353eab92207508a7dea99), [`ed0b7d3`](https://github.com/bluesky-social/atproto/commit/ed0b7d38811bb24952a3f1da988b02e39934d222), [`222f4bc`](https://github.com/bluesky-social/atproto/commit/222f4bc600fb89c75fafee95ef3c837b1721601e), [`46fdec9`](https://github.com/bluesky-social/atproto/commit/46fdec90d4eca8c8d7c8eeb7dc801cf52ffaaed6), [`ed0b7d3`](https://github.com/bluesky-social/atproto/commit/ed0b7d38811bb24952a3f1da988b02e39934d222), [`ffcb7c5`](https://github.com/bluesky-social/atproto/commit/ffcb7c54e4dcedb10eed9175fbc939761462bca6)]:
+  - @atproto/xrpc-server@0.13.0
+  - @atproto/api@0.20.43
+  - @atproto/lex@0.3.9
+  - @atproto-labs/opentelemetry-node@0.2.0
+  - @atproto/syntax@0.7.6
+  - @atproto-labs/xrpc-utils@0.1.21
+  - @atproto/sync@0.4.8
+  - @atproto/repo@0.10.13
+  - @atproto/common@0.8.2
+  - @atproto/identity@0.5.11
+
 ## 0.0.277
 
 ### Patch Changes
