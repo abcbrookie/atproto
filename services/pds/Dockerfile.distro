@@ -1,0 +1,52 @@
+# PDS image built from this repository, laid out like ghcr.io/bluesky-social/pds so
+# the existing compose file, pds.env and pdsadmin keep working.
+#
+#   docker build -f services/pds/Dockerfile.distro -t my-pds:local .
+
+FROM node:24.18-alpine3.23 AS build
+RUN npm install -g pnpm@11.11.0
+WORKDIR /app
+COPY ./.npmrc ./.nvmrc ./package.json ./pnpm-lock.yaml ./pnpm-workspace.yaml ./
+COPY ./tsconfig ./tsconfig
+COPY ./lexicons ./lexicons
+COPY ./packages/bsync/proto ./packages/bsync/proto
+COPY ./packages/api ./packages/api
+COPY ./packages/aws ./packages/aws
+COPY ./packages/common-web ./packages/common-web
+COPY ./packages/common ./packages/common
+COPY ./packages/crypto ./packages/crypto
+COPY ./packages/did ./packages/did
+COPY ./packages/identity ./packages/identity
+COPY ./packages/internal ./packages/internal
+COPY ./packages/lex-cli ./packages/lex-cli
+COPY ./packages/lex ./packages/lex
+COPY ./packages/lexicon ./packages/lexicon
+COPY ./packages/oauth ./packages/oauth
+COPY ./packages/pds ./packages/pds
+COPY ./packages/repo ./packages/repo
+COPY ./packages/syntax ./packages/syntax
+COPY ./packages/ws-client ./packages/ws-client
+COPY ./packages/xrpc-server ./packages/xrpc-server
+COPY ./packages/xrpc ./packages/xrpc
+COPY ./services/pds ./services/pds
+RUN PUPPETEER_SKIP_DOWNLOAD=true pnpm install --frozen-lockfile
+RUN pnpm run --recursive --stream --workspace-concurrency 1 --filter 'pds-service...' build -- --force
+RUN pnpm install --prod --shamefully-hoist --frozen-lockfile --prefer-offline --config.confirmModulesPurge=false
+
+FROM ghcr.io/bluesky-social/pds:latest AS distro
+
+FROM node:24.18-alpine3.23
+RUN apk add --update dumb-init
+ENTRYPOINT ["dumb-init", "--"]
+COPY --from=build /app /app
+COPY --from=distro /usr/local/bin/goat /usr/local/bin/goat
+WORKDIR /app/services/pds
+# The distro's entry point (tls-check route and friends) in place of the bare one.
+RUN cp distro-index.ts index.ts
+EXPOSE 3000
+ENV PDS_PORT=3000
+ENV NODE_ENV=production
+ENV UV_USE_IO_URING=0
+CMD ["node", "--enable-source-maps", "index.ts"]
+LABEL org.opencontainers.image.source=https://github.com/abcbrookie/atproto
+LABEL org.opencontainers.image.description="AT Protocol PDS (distro layout)"
